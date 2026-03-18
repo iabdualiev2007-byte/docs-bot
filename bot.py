@@ -3,27 +3,32 @@ import os
 from PIL import Image
 from io import BytesIO
 import pytesseract
+from dotenv import load_dotenv
 
-# Tesseract o'rnatilgan yo'lini ko'rsatish
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-# Telegram bot tokeni (environment variable orqali)
+# .env faylidan tokenni olish
+load_dotenv()
 TOKEN = os.getenv("TOKEN")
+
+# Telegram bot yaratish
 bot = telebot.TeleBot(TOKEN)
 
+# Windows uchun Tesseract yo'li (o'zingiz o'rnatgan joyni qo'ying)
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+# SR DOCS formatini yaratish funksiyasi
 def make_docs(text):
     try:
-        lines = text.split("\n")
-
-        passport = lines[0].strip()
-        name = lines[1].strip().upper().replace(" ", "/")
-        birth = lines[2].strip()
-        expiry = lines[3].strip()
-        gender = lines[4].strip().upper()
+        # Bo‘sh qatordan xalos bo‘lish
+        lines = [line.strip() for line in text.split("\n") if line.strip() != ""]
+        
+        passport = lines[0]         # Pasport raqami
+        name = lines[1].upper().replace(" ", "/")  # Ism va familiya
+        birth = lines[2]            # Tug‘ilgan sana
+        expiry = lines[3]           # Amal qilish muddati
+        gender = lines[4].upper()   # Jins
 
         docs = f"SR DOCS HY HK1-P-UZB-{passport}-UZB-{birth}-{gender}-{expiry}-{name}"
         return docs
-
     except Exception as e:
         return f"❌ Format xato. Qaytadan tekshir.\nError: {e}"
 
