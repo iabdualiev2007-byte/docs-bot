@@ -12,7 +12,7 @@ TOKEN = os.getenv("TOKEN")
 # Telegram bot yaratish
 bot = telebot.TeleBot(TOKEN)
 
-# Windows uchun Tesseract yo'li (o'zingiz o'rnatgan joyni qo'ying)
+# Windows uchun Tesseract yo'li
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # SR DOCS formatini yaratish funksiyasi
