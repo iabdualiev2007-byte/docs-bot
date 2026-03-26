@@ -12,20 +12,20 @@ TOKEN = os.getenv("TOKEN")
 # Telegram bot yaratish
 bot = telebot.TeleBot(TOKEN)
 
-# Windows uchun Tesseract yo'li
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# Tesseract path server va lokalga moslash
+pytesseract.pytesseract.tesseract_cmd = os.environ.get("TESSERACT_CMD") or "tesseract"
 
 # SR DOCS formatini yaratish funksiyasi
 def make_docs(text):
     try:
         # Bo‘sh qatordan xalos bo‘lish
         lines = [line.strip() for line in text.split("\n") if line.strip() != ""]
-        
+
         passport = lines[0]         # Pasport raqami
         name = lines[1].upper().replace(" ", "/")  # Ism va familiya
-        birth = lines[2]            # Tug‘ilgan sana
+        birth = lines[2]            # Tug‘ilgan sana (format: DDMMMYY yoki DD/MM/YYYY)
         expiry = lines[3]           # Amal qilish muddati
-        gender = lines[4].upper()   # Jins
+        gender = lines[4].upper()   # Jins (M/F)
 
         docs = f"SR DOCS HY HK1-P-UZB-{passport}-UZB-{birth}-{gender}-{expiry}-{name}"
         return docs
@@ -45,13 +45,13 @@ def handle_photo(message):
         # Telegramdan rasmni olish
         file_info = bot.get_file(message.photo[-1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
-        
+
         # Rasmni PIL bilan ochish
         img = Image.open(BytesIO(downloaded_file))
-        
+
         # OCR orqali matnni olish
         text = pytesseract.image_to_string(img, lang='eng')
-        
+
         # SR DOCS formatiga o‘tkazish
         result = make_docs(text)
         bot.reply_to(message, result)
@@ -59,4 +59,5 @@ def handle_photo(message):
         bot.reply_to(message, f"❌ Rasmni o'qishda xatolik: {e}")
 
 # Botni ishga tushirish
-bot.polling()
+print("📌 Docs-Bot ishga tushdi...")
+bot.infinity_polling()
