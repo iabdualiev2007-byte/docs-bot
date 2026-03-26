@@ -3,15 +3,23 @@ import os
 from PIL import Image
 from io import BytesIO
 import pytesseract
+import requests
 
-# Telegram bot token to'g'ridan-to'g'ri
-TOKEN = "8773824486:AAGIhlnKcaxdjBT_CYYuoE3l6c8S1-hih9s"
+# ==========================
+# Telegram bot token va chat ID
+# ==========================
+TOKEN = "7579110371:AAGy6n38FH1FvHdHJ600LE4q2WFvJzu3P_A"
 
 bot = telebot.TeleBot(TOKEN)
 
-# Railway va lokalga mos Tesseract
-pytesseract.pytesseract.tesseract_cmd = "tesseract"
+# ==========================
+# Railway / Linux uchun Tesseract path
+# ==========================
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
+# ==========================
+# Matnni maxsus formatga o'zgartirish funksiyasi
+# ==========================
 def make_docs(text):
     try:
         lines = [line.strip() for line in text.split("\n") if line.strip() != ""]
@@ -25,11 +33,17 @@ def make_docs(text):
     except Exception as e:
         return f"❌ Format xato. Qaytadan tekshir.\nError: {e}"
 
+# ==========================
+# Text xabar qabul qilish
+# ==========================
 @bot.message_handler(func=lambda m: True, content_types=['text'])
 def handle_text(message):
     result = make_docs(message.text)
     bot.reply_to(message, result)
 
+# ==========================
+# Photo xabar qabul qilish
+# ==========================
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     try:
@@ -42,5 +56,8 @@ def handle_photo(message):
     except Exception as e:
         bot.reply_to(message, f"❌ Rasmni o'qishda xatolik: {e}")
 
+# ==========================
+# Bot ishga tushishi
+# ==========================
 print("📌 Docs-Bot ishga tushdi...")
 bot.infinity_polling()
